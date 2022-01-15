@@ -84,7 +84,7 @@ public class Sender extends Service {
                     this.initNumBytes,
                     AudioTrack.MODE_STATIC
             );
-            initBlip.write(bytes, 0, bytes.size());
+            initBlip.write(bytes, 0, bytes.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,7 +122,7 @@ public class Sender extends Service {
     public void onDestroy() {
         super.onDestroy();
     }
-    
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_NOT_STICKY;
