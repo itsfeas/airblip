@@ -30,10 +30,13 @@ public class Receiver {
     private PrintWriter out;
     private BufferedReader in;
     private List<Byte> file;
+    PythonInterpreter py = new PythonInterpreter();
 
     public Receiver() {
-        try(PythonInterpreter pyInterp = new PythonInterpreter()) {
+        try {
             py.exec("print('Hello Python World!')");
+        } finally {
+
         }
     }
 
