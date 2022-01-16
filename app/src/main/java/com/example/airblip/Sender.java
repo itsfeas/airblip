@@ -51,7 +51,8 @@ public class Sender {
         List<Integer> intBins = new ArrayList<Integer>(len);
         String binStr;
         for (int i = 0; i<str.length(); i++) {
-            binStr = Integer.toBinaryString(bytes[i]);
+            String binRaw = Integer.toBinaryString(bytes[i]);
+            binStr = "".concat(("00000000" + binRaw).substring(binRaw.length()));
             for (int j = 0; j<binStr.length(); j++) {
                 if (binStr.charAt(j)=='1') {
                     bins.add(true);
