@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ex) {
             changeOverlayText("Send failed");
             revealClose();
+            v.setEnabled(true);
         }
 
     }
