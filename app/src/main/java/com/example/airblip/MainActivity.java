@@ -18,8 +18,8 @@ import java.util.concurrent.RunnableFuture;
 
 public class MainActivity extends AppCompatActivity {
 
-    RunnableFuture sendFuture;
-    RunnableFuture receiveFuture;
+    Receiver  receiver = new Receiver();
+    Sender sender = new Sender();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,29 +31,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void startReceiving(View v){
         v.setEnabled(false);
-
-        sendFuture = new ReceiverFuture();
-
+        receiver.beginListening();
     }
 
     public void startSending(View v){
         v.setEnabled(false);
-        //Connect messenger to service
-        startService(new Intent( this, Sender.class ));
-        bindService(new Intent(this, Sender.class), senderServiceConnection,
-                Context.BIND_AUTO_CREATE);
-
-        Bundle bundle = new Bundle();
-        bundle.putString("1", "testString");
-        Message message = Message.obtain();
-        message.setData(bundle);
-        message.what = 1;
-        try {
-            this.sendMessenger.send(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
+        sender.setStr("Hello World");
+        sender.beginSending();
     }
 
     public void openOverlay(){
@@ -61,6 +45,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeOverlayText(String text){
-        TextView text = findViewById(R.id.statusText);
+//        TextView text = findViewById(R.id.statusText);
     }
 }
