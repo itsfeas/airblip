@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    //test
+    
 
     public void startReceiving(View v){
         v.setEnabled(false);
