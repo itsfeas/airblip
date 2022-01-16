@@ -343,7 +343,7 @@ if __name__ == "__main__":
 
     # process back into bits, then into text
     decoded_raw = audio_to_message(input_sound)
-    decoded_cleaned = clip_string(decoded_raw)
+    decoded_cleaned = clip_string(decoded_raw) # gets rid of end pieces
     print(decoded_cleaned)
     print(binary_string_to_ascii(decoded_cleaned))
 
