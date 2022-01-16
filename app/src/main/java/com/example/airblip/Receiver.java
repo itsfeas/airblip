@@ -11,6 +11,8 @@ import android.os.RemoteException;
 
 import com.google.common.primitives.Bytes;
 
+import org.python.util.PythonInterpreter;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,9 +21,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
-//                byte[] bytes = msg.getData().getByteArray("2");
-//                        service.setPath(bytes.toString());
-
 public class Receiver extends Service {
     private Socket sock;
     private final String host = "localhost";
@@ -29,8 +28,12 @@ public class Receiver extends Service {
     private BufferedReader in;
     private List<Byte> file;
     private final Messenger messenger = new Messenger(new toServiceReceiver(this));
+    PythonInterpreter py = new PythonInterpreter();
 
     public Receiver() {
+        try(PythonInterpreter pyInterp = new PythonInterpreter()) {
+            py.exec("print('Hello Python World!')");
+        }
     }
 
     private Socket getSocket() {
