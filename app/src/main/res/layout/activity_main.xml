@@ -126,6 +126,7 @@
                         android:onClick="startSending"
                         android:backgroundTint= "@color/dark_blue"
                         android:text="Send"
+                        android:textColor="@color/light_yellow"
                         android:textAllCaps="false"
                         android:id = "@+id/sendButton"
                         android:paddingVertical="10dp"
