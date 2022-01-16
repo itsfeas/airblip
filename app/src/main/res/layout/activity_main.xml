@@ -45,6 +45,37 @@
                     android:onClick="startReceiving"
                     android:layout_below="@+id/receive" />
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_marginVertical="32dp"
+                android:layout_marginHorizontal="16dp">
+
+                <TextView
+                    android:id="@+id/exit"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:onClick="reset"
+                    android:text="X" />
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerInParent="true"
+                    android:text="Searching for sender..." />
+
+
+
+
+            </RelativeLayout>
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

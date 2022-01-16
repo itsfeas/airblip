@@ -11,6 +11,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.view.View;
 import android.content.Intent;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent( this, Receiver.class ));
         bindService(new Intent(this, Receiver.class), senderServiceConnection,
                 Context.BIND_AUTO_CREATE);
+        Bundle bundle = new Bundle();
+        Message message = Message.obtain();
+        message.what = 1;
+        try {
+            sendMessenger.send(message);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -73,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void changeOverlayText(){
-
+    public void changeOverlayText(String text){
+//        TextView text = findViewById(R.id.statusText);
     }
 }
