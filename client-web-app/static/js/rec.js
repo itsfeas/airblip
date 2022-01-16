@@ -10,8 +10,10 @@ function record() {
             "content-type": "application/json"
         })
     })
-    // .then((response) => {
-    //     // document.getElementById("message").blur()
-    //     // return response.json();
-    // })
+    .then((response) => {
+        // document.getElementById("message").blur()
+        // return response.json();
+
+        setTimeout("location.reload(true);", 3000+10000);
+    })
 }
