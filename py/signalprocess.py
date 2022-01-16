@@ -12,12 +12,162 @@ import scipy
 from scipy.signal import butter, lfilter
 import bokeh
 from bokeh.plotting import figure, show
+import pyaudio, wave
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
+import PyQt5.QtGui
+from multiprocessing import Process
+import threading
+
+
 
 
 BAUD = 100
 FREQ =  1000
 SAMPLE_RATE = 48000
 np.set_printoptions(threshold=sys.maxsize)
+
+
+
+class App(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.title = "AirBlip"
+        self.width = 1024
+        self.height = 768
+        self.left = 20
+        self.top = 20
+        self.UIinit()
+
+        self.record_state = False
+        self.recorder = Recorder()
+
+    def UIinit(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        
+
+        hbox = QHBoxLayout()
+        hbox.setAlignment(Qt.AlignCenter)
+        
+        self.button = QPushButton("RECORD", self)
+        self.button.setFont(QFont("Arial", 15))
+        self.button.setAutoFillBackground(True)
+        self.button.setStyleSheet("border: 3px solid white")
+        # button.setAutoFillBackground(True)
+        self.button.resize(200, 75)
+        self.button.move(self.width//2 - 100, 400)
+
+
+        self.label = QLabel("", self)
+        self.label.setFont(QFont("Arial", 15))
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.move(self.width//2 - 100, 200)
+
+        self.button.clicked.connect(self.click)
+        
+
+        self.show()
+
+    def click(self):
+        print(self.record_state)
+        self.record_state = not self.record_state
+        if self.record_state:
+            self.recorder.recording = True
+            self.button_stop_mode()
+            p = threading.Thread(target=self.recorder.record())
+            p.start()
+        else:
+            self.recorder.recording = False
+            self.button_record_mode()
+            time.sleep(1)
+            data = self.recorder.return_np()
+            decoded_raw = audio_to_message(data)
+            decoded_cleaned = clip_string(decoded_raw)
+            message = self.decode_byte_string(decoded_cleaned)
+            self.display_message(message)
+
+    def decode_byte_string(self, string):
+        return binary_string_to_ascii(string)
+
+    def display_message(self, string):
+        self.label.setText("Message: " + string)
+
+    def button_stop_mode(self):
+        self.button = QPushButton("STOP", self)
+        self.button.setFont(QFont("Arial", 15))
+        self.button.setAutoFillBackground(True)
+        self.button.setStyleSheet("border: 3px solid red")
+        # button.setAutoFillBackground(True)
+        self.button.resize(200, 75)
+        self.button.move(self.width//2 - 100, 400)
+
+    def button_record_mode(self):
+        self.button = QPushButton("RECORD", self)
+        self.button.setFont(QFont("Arial", 15))
+        self.button.setAutoFillBackground(True)
+        self.button.setStyleSheet("border: 3px solid white")
+        # button.setAutoFillBackground(True)
+        self.button.resize(200, 75)
+        self.button.move(self.width//2 - 100, 400)
+
+
+
+
+
+
+class Recorder:
+    def __init__(self):
+        self.recording = False
+
+    
+    def record(self):
+        chunk = 1024
+        # sample format
+        FORMAT = pyaudio.paInt16
+        # mono, change to 2 if you want stereo
+        channels = 1
+        
+        # initialize PyAudio object
+        p = pyaudio.PyAudio()
+        # open stream object as input & output
+        stream = p.open(format=FORMAT,
+                        channels=channels,
+                        rate=SAMPLE_RATE,
+                        input=True,
+                        output=True,
+                        frames_per_buffer=chunk)
+        frames = []
+        print("Recording...")
+
+        while (self.recording):
+            data = stream.read(chunk)
+            # if you want to hear your voice while recording
+            # stream.write(data)
+            frames.append(data)
+            QApplication.processEvents()
+        print("Finished recording.")
+
+        wf = wave.open("recorded.wav", "wb")
+        # set the channels
+        wf.setnchannels(1)
+        # set the sample format
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        # set the sample rate
+        wf.setframerate(SAMPLE_RATE)
+        # write the frames as bytes
+        wf.writeframes(b"".join(frames))
+        # close the file
+        wf.close()
+
+
+    def return_np(self):
+        y, sr = librosa.load("recorded.wav")
+        input_sound = librosa.resample(y, sr, SAMPLE_RATE)
+        print(input_sound.shape, SAMPLE_RATE)
+
+        return y
 
 def bits_to_sound(bits):
     """
@@ -151,6 +301,28 @@ def crop(data):
 
     return data[low_bound:high_bound], low_bound, high_bound
 
+def clip_front(string):
+    next_state = False
+    if string[0] == "0":
+        next_state = True
+
+    idx = 0
+    for i in range(1, len(string)):
+        if string[i] == str(int(next_state)):
+            next_state = not next_state
+        else:
+            idx = i
+            break
+    return string[idx:]
+
+def clip_back(string):
+    idx = string.find("10101010")
+    return string[:idx]
+
+def clip_string(string):
+    return clip_back(clip_front(string))
+
+
 
 def audio_to_message(data):
     t = np.linspace(0, data.shape[0]/SAMPLE_RATE, data.shape[0])
@@ -183,6 +355,28 @@ def audio_to_message(data):
     return binary
 
 
+def binary_string_to_ascii(string):
+
+    j = 0
+    chars = []
+    bin_char = ""
+    for b in string:
+        
+        bin_char += b
+
+        j+=1
+        if j >= 8:
+            j=0
+            integer = int(bin_char, 2)
+            ascii_char = chr(integer)
+            chars.append(ascii_char)
+            bin_char = ""
+
+    chars.reverse()
+    return "".join(chars)
+
+
+
 if __name__ == "__main__":
     
     sound = wvfrm(FREQ, 2)
@@ -198,26 +392,67 @@ if __name__ == "__main__":
     print_binary("testfile")
 
 
-    start_beeps = starting_byte()
-    start_beeps = np.concatenate([start_beeps, start_beeps,start_beeps,start_beeps], axis=0)
+    # start_beeps = starting_byte()
+    # start_beeps = np.concatenate([start_beeps, start_beeps,start_beeps,start_beeps], axis=0)
 
-    end_beeps = starting_byte()
-    end_beeps = np.concatenate([end_beeps, end_beeps, end_beeps, end_beeps], axis=0)
+    # end_beeps = starting_byte()
+    # end_beeps = np.concatenate([end_beeps, end_beeps, end_beeps, end_beeps], axis=0)
 
-    sd.play(start_beeps, SAMPLE_RATE)
-    time.sleep(2)
-    sd.stop()
+    # sd.play(start_beeps, SAMPLE_RATE)
+    # time.sleep(2)
+    # sd.stop()
 
-    sound = bits_to_sound(bits("testfile"))
-    sound = np.concatenate([start_beeps, sound, end_beeps], axis=0)
+    # sound = bits_to_sound(bits("testfile"))
+    # sound = np.concatenate([start_beeps, sound, end_beeps], axis=0)
 
-    sd.play(sound, SAMPLE_RATE)
-    time.sleep(4)
-    sd.stop()
+    # sd.play(sound, SAMPLE_RATE)
+    # time.sleep(4)
+    # sd.stop()
+
+
+    # chunk = 1024
+    # # sample format
+    # FORMAT = pyaudio.paInt16
+    # # mono, change to 2 if you want stereo
+    # channels = 1
+    
+    # record_seconds = 5
+    # # initialize PyAudio object
+    # p = pyaudio.PyAudio()
+    # # open stream object as input & output
+    # stream = p.open(format=FORMAT,
+    #                 channels=channels,
+    #                 rate=SAMPLE_RATE,
+    #                 input=True,
+    #                 output=True,
+    #                 frames_per_buffer=chunk)
+    # frames = []
+    # print("Recording...")
+
+    # for i in range(int(SAMPLE_RATE / chunk * record_seconds)):
+    #     data = stream.read(chunk)
+    #     # if you want to hear your voice while recording
+    #     # stream.write(data)
+    #     frames.append(data)
+    # print("Finished recording.")
+
+    # wf = wave.open("recorded.wav", "wb")
+    # # set the channels
+    # wf.setnchannels(1)
+    # # set the sample format
+    # wf.setsampwidth(p.get_sample_size(FORMAT))
+    # # set the sample rate
+    # wf.setframerate(SAMPLE_RATE)
+    # # write the frames as bytes
+    # wf.writeframes(b"".join(frames))
+    # # close the file
+    # wf.close()
+
 
     y, sr = librosa.load("testaudio.mp3")
     input_sound = librosa.resample(y, sr, SAMPLE_RATE)
     print(input_sound.shape, SAMPLE_RATE)
+
 
 
     # t = np.linspace(0, input_sound.shape[0]/SAMPLE_RATE, input_sound.shape[0])
@@ -302,6 +537,15 @@ if __name__ == "__main__":
     # write("filtered_testaudio.wav", SAMPLE_RATE, band_pass_sound)
 
     decoded_raw = audio_to_message(input_sound)
-    decoded_cleaned = 
+    decoded_cleaned = clip_string(decoded_raw)
+    print(decoded_cleaned)
+    print(binary_string_to_ascii(decoded_cleaned))
+
+
+
+
+    app = QApplication([])
+    ex = App()
+    sys.exit(app.exec_())
 
 
