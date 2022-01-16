@@ -1,16 +1,10 @@
 package com.example.airblip;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+
 import android.view.View;
-import android.content.Intent;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -19,12 +13,9 @@ import android.widget.TextView;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
-import java.util.concurrent.RunnableFuture;
-
 
 public class MainActivity extends AppCompatActivity {
 
-    Receiver receiver = new Receiver();
     Sender sender = new Sender();
 
     @Override
@@ -32,21 +23,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         closeOverlay();
-
-    }
-
-
-    public void startReceiving(View v) {
-        v.setEnabled(false);
-        changeOverlayText("Receiving...");
-        openOverlay();
-        try {
-            receiver.beginListening();
-            changeOverlayText("Your message:");
-        } catch (Exception ex) {
-            changeOverlayText("Listen failed.");
-            revealClose();
-        }
 
     }
 
@@ -85,11 +61,6 @@ public class MainActivity extends AppCompatActivity {
         TextView text = findViewById(R.id.close);
         text.setVisibility(View.INVISIBLE);
 
-    }
-
-    public void openOverlay(View v) {
-
-        openOverlay();
     }
 
     public void openOverlay() {
@@ -131,15 +102,6 @@ public class MainActivity extends AppCompatActivity {
         hideClose();
     }
 
-//    private void showMessage(){
-//        RelativeLayout layout =findViewById(R.id.resultBox);
-//        layout.setVisibility(View.VISIBLE);
-//    }
-//
-//    private void hideMessage(){
-//        RelativeLayout layout =findViewById(R.id.resultBox);
-//        layout.setVisibility(View.GONE);
-//    }
 
     public void changeOverlayText(String text) {
         TextView statusText = findViewById(R.id.status);
