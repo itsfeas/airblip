@@ -14,7 +14,7 @@ import bokeh
 from bokeh.plotting import figure, show
 
 
-BAUD = 200
+BAUD = 100
 FREQ =  2000
 SAMPLE_RATE = 48000
 np.set_printoptions(threshold=sys.maxsize)
@@ -92,6 +92,17 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     return y
 
 
+def moving_average_filter(data):
+    T_bit = 1/BAUD
+    return np.convolve(data, np.ones(int(T_bit * SAMPLE_RATE/2))/(T_bit*SAMPLE_RATE/2), mode="valid")
+
+def rms_filter(data):
+    a2 = np.power(data,2)
+    T_bit = 1/BAUD
+    window = np.ones(int(T_bit * SAMPLE_RATE))/float(int(T_bit * SAMPLE_RATE))
+    return np.sqrt(np.convolve(a2, window, 'valid'))
+
+
 
 if __name__ == "__main__":
     
@@ -137,7 +148,7 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    band_pass_sound = butter_bandpass_filter(input_sound, 1800, 2200, SAMPLE_RATE)
+    band_pass_sound = butter_bandpass_filter(input_sound, 1900, 2100, SAMPLE_RATE)
     plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(scipy.fft.fft(band_pass_sound)[0:input_sound.shape[0]//2]))
     plt.grid()
     plt.show()
@@ -156,6 +167,11 @@ if __name__ == "__main__":
 
     p = figure()
     p.line(t, band_pass_sound, line_width=2)
+    band_pass_sound
+
+
+    avg = rms_filter(band_pass_sound)
+    p.line(t, avg, line_width=2, line_color="orange")
     show(p)
    
     write("filtered_testaudio.wav", SAMPLE_RATE, band_pass_sound)
