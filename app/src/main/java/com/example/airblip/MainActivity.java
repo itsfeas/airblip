@@ -58,19 +58,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void startSending(View v) {
         v.setEnabled(false);
-        changeOverlayText("Sending...");
-        hideClose();
-        try {
-            EditText message = (EditText) findViewById(R.id.messageInput);
-            sender.setStr(message.getText().toString());
-            sender.beginSending();
-            changeOverlayText("Message Sent!");
-            revealClose();
-            v.setEnabled(true);
-        } catch (Exception ex) {
-            changeOverlayText("Send failed");
-            revealClose();
-            v.setEnabled(true);
+        sender.setStr("Hello World");
+        sender.beginSending();
+//        PythonEnv.run();
+    }
 
         }
 
