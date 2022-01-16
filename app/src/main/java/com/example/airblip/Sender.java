@@ -28,15 +28,15 @@ import java.util.List;
 
 public class Sender extends Service {
     private boolean fileSetup;
-    private Path path;
+    private String sendStr;
     private AudioTrack initBlip;
     private AudioTrack dataBlip;
 
     private double transferFreq = 100;                                  // hz
-    private double soundFreq = 1000;                                    // hz
+    private double soundFreq = 1500;                                    // hz
     private int sampleRate = 20000;                                     // hz
 
-    private double initBlipLen = 5;                                     // secs
+    private double initBlipLen = 1;                                     // secs
     private int initNumBytes = (int) (initBlipLen * sampleRate);     // number of bytes for conf blip
 
     List<Byte> file;
@@ -50,22 +50,26 @@ public class Sender extends Service {
         return this.fileSetup;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void setPath(String inputPath) {
-        this.path = Paths.get(inputPath);
+    public void setStr(String str) {
+        this.sendStr = str;
         this.fileSetup = true;
     }
 
-    public void setFileBytes(List<Byte> file) {
+    public void setSendBytes(List<Byte> bytes) {
         this.file = file;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean readFileBytes() throws IOException {
+//        if (!getFileSetup()) { return false; }
+//        byte[] bytes = Files.readAllBytes(this.path);
+//        List<Byte> file = Bytes.asList(bytes);
+//        setFileBytes(file);
+//        return true;
         if (!getFileSetup()) { return false; }
-        byte[] bytes = Files.readAllBytes(this.path);
+        byte[] bytes = this.sendStr.getBytes();
         List<Byte> file = Bytes.asList(bytes);
-        setFileBytes(file);
+        setSendBytes(file);
         return true;
     }
 
