@@ -13,49 +13,26 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.TextView;
 
+import java.util.concurrent.RunnableFuture;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private Messenger sendMessenger;
-    private Messenger receiveMessenger;
-    private ServiceConnection senderServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder iBinder) {
-            sendMessenger = new Messenger(iBinder);
-        }
-        public void onServiceDisconnected(ComponentName className) {
-        }
-    };
-    private ServiceConnection receiverServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder iBinder) {
-            receiveMessenger= new Messenger(iBinder);
-        }
-        public void onServiceDisconnected(ComponentName className) {
-        }
-    };
+    RunnableFuture sendFuture;
+    RunnableFuture receiveFuture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
     }
 
 
     public void startReceiving(View v){
         v.setEnabled(false);
-        //Connect messenger to service
-        startService(new Intent( this, Receiver.class ));
-        bindService(new Intent(this, Receiver.class), senderServiceConnection,
-                Context.BIND_AUTO_CREATE);
-        Bundle bundle = new Bundle();
-        Message message = Message.obtain();
-        message.what = 1;
-        try {
-            sendMessenger.send(message);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+
+        sendFuture = new ReceiverFuture();
 
     }
 
@@ -72,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         message.setData(bundle);
         message.what = 1;
         try {
-            sendMessenger.send(message);
+            this.sendMessenger.send(message);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -84,6 +61,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeOverlayText(String text){
-//        TextView text = findViewById(R.id.statusText);
+        TextView text = findViewById(R.id.statusText);
     }
 }
