@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-public class Sender extends Service {
+public class Sender {
     private boolean fileSetup;
     private String sendStr;
     private AudioTrack initBlip;
@@ -42,7 +42,6 @@ public class Sender extends Service {
     private int initNumBytes = (int) (initBlipLen * sampleRate);     // number of bytes for conf blip
 
     List<Byte> file;
-    private final Messenger messenger = new Messenger(new toServiceSender(this));
 
     public Sender() {
         setUpInitBlip();
@@ -66,13 +65,7 @@ public class Sender extends Service {
         this.file = file;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean readFileBytes() throws IOException {
-//        if (!getFileSetup()) { return false; }
-//        byte[] bytes = Files.readAllBytes(this.path);
-//        List<Byte> file = Bytes.asList(bytes);
-//        setFileBytes(file);
-//        return true;
         if (!getFileSetup()) { return false; }
         byte[] bytes = this.sendStr.getBytes();
         List<Byte> file = Bytes.asList(bytes);
@@ -80,7 +73,6 @@ public class Sender extends Service {
         return true;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setUpDataBlip() {
         try {
             readFileBytes();
@@ -115,19 +107,6 @@ public class Sender extends Service {
         this.dataBlip.play();
     }
 
-    private void sendConf() {
-        Bundle bundle = new Bundle();
-        bundle.putString("1", "A");
-        Message msg = Message.obtain();
-        msg.setData(bundle);
-        try {
-            this.messenger.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void beginSending() {
         setUpInitBlip();
         playInitBlip();
@@ -135,26 +114,5 @@ public class Sender extends Service {
         setUpDataBlip();
         playDataBlip();
         playInitBlip();
-
-        sendConf();                 //send confirmation of send to activity
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return messenger.getBinder();
-    }
-
-    @Override
-    public void onCreate() {
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_NOT_STICKY;
     }
 }
