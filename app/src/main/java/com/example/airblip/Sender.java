@@ -7,23 +7,30 @@ import android.media.AudioTrack;
 import com.google.common.primitives.Bytes;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Sender {
     private boolean fileSetup;
     private String sendStr;
+    private byte[] initBlipBytes;
+    private byte[] dataBlipBytes;
     private AudioTrack initBlip;
     private AudioTrack dataBlip;
 
-    private double transferFreq = 50;                                  // hz
-    private double soundFreq = 1500;                                    // hz
+    private final double transferFreq = 100;                                  // hz
+    private double dataSoundFreq = 1000;                                    // hz
+    private double initSoundFreq = 1500;                                    // hz
     private int sampleRate = 20000;                                     // hz
 
     private double initBlipLen = 1;                                     // secs
     private int initNumBytes = (int) (initBlipLen * sampleRate);     // number of bytes for conf blip
+    private int dataNumBytes;     // number of bytes for conf blip
 
-    List<Byte> file;
+    List<Boolean> file;
+    List<Integer> boolInts;
 
     public Sender() {
         setUpInitBlip();
@@ -38,24 +45,40 @@ public class Sender {
         this.fileSetup = true;
     }
     
-    public void setSendBytes(byte[] bytes) {
-        List<Byte> file = Bytes.asList(bytes);
-        setSendBytes(bytes);
+    public void setSendBytes() throws UnsupportedEncodingException {
+        String str = this.sendStr;
+        int len = str.length()*8;
+
+        List<Boolean> bins = new ArrayList<Boolean>(len);
+        List<Integer> intBins = new ArrayList<Integer>(len);
+        String binStr;
+        for (int i = 0; i<str.length(); i++) {
+            binStr = Integer.toBinaryString(str.charAt(i) & 255 | 256).substring(1);
+            for (int j = 0; j<binStr.length(); j++) {
+                if (binStr.charAt(j)=='1') {
+                    bins.add(true);
+                    intBins.add(1);
+                }
+                else {
+                    bins.add(false);
+                    intBins.add(0);
+                }
+            }
+            this.file = bins;
+            this.boolInts = intBins;
+        }
     }
 
-    private byte[] getDataBytes() {
-        return Bytes.toArray(this.file);
-    }
-
-    public void setSendBytes(List<Byte> bytes) {
+    public void setSendBytes(List<Boolean> bytes) {
         this.file = bytes;
     }
 
     private boolean readFileBytes() throws IOException {
         if (!getFileSetup()) { return false; }
-        byte[] bytes = this.sendStr.getBytes();
-        List<Byte> file = Bytes.asList(bytes);
-        setSendBytes(file);
+//        byte[] bytes = this.sendStr.getBytes(StandardCharsets.UTF_8);
+//        List<Byte> file = Bytes.asList(bytes);
+        setSendBytes();
+        genSendSnd();
         return true;
     }
 
@@ -70,17 +93,86 @@ public class Sender {
                     this.initNumBytes,
                     AudioTrack.MODE_STATIC
             );
-            byte[] bytes = getDataBytes();
-            dataBlip.write(bytes, 0, this.file.size());
+//            genSendSnd();
+            dataBlip.write(this.dataBlipBytes, 0, this.dataBlipBytes.length);
             this.dataBlip = dataBlip;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+//    private void emptyBytes(){
+//        // fill out the array
+//        for (int i = 0; i < numSamples; ++i) {
+//            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+//        }
+//
+//        // convert to 16 bit pcm sound array
+//        // assumes the sample buffer is normalised.
+//        int idx = 0;
+//        for (final double dVal : sample) {
+//            // scale to maximum amplitude
+//            final short val = (short) ((dVal * 32767));
+//            // in 16 bit wav PCM, first byte is the low order byte
+//            generatedSnd[idx++] = (byte) (val & 0x00ff);
+//            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+//
+//        }
+//    }
+
+    // sinewave gen based on
+    // https://stackoverflow.com/questions/8698633/how-to-generate-a-particular-sound-frequency
+    void genTone(){
+        // fill out the array
+        double sample[] = new double[initNumBytes];
+        double replicate[] = new double[initNumBytes];
+        for (int i = 0; i < initNumBytes; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/initSoundFreq));
+        }
+        for (int i = 0; i < initNumBytes; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/initSoundFreq));
+        }
+        int idx = 0;
+        byte generatedSnd[] = new byte[2 * initNumBytes];
+
+        for (final double dVal : sample) {
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+        }
+        this.initBlipBytes = generatedSnd;
+    }
+
+    void genSendSnd(){
+        int nBits = this.file.size();
+        List<Integer> bits = this.boolInts;
+        double time = (double) nBits/this.transferFreq;
+        this.dataNumBytes = (int) (nBits * sampleRate);     // number of bytes for info blip
+
+        // fill out the array
+        double sample[] = new double[dataNumBytes];
+        for (int i = 0; i < dataNumBytes; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/dataSoundFreq));
+        }
+
+        int i = 0;
+        byte generatedSnd[] = new byte[2 * dataNumBytes];
+        for (final double dVal : sample) {
+            // scale to maximum amplitude
+
+            short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[2*i] = (byte) ((val & 0x00ff)*(bits.get(i/dataNumBytes)));
+            generatedSnd[2*i+1] = (byte) ((val & 0xff00) >>> 8);
+            i++;
+        }
+        this.dataBlipBytes = generatedSnd;
+    }
+
     private void setUpInitBlip() {
-        List<Byte> bytesGenerics = Collections.nCopies(this.initNumBytes, new Byte((byte) 1));
-        byte[] bytes = Bytes.toArray(bytesGenerics);
+        genTone();
         try {
             AudioTrack initBlip = new AudioTrack(
                     AudioManager.STREAM_MUSIC,
@@ -90,7 +182,7 @@ public class Sender {
                     this.initNumBytes,
                     AudioTrack.MODE_STATIC
             );
-            initBlip.write(bytes, 0, bytes.length);
+            initBlip.write(this.initBlipBytes, 0, this.initBlipBytes.length);
             this.initBlip = initBlip;
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,6 +203,6 @@ public class Sender {
 
         setUpDataBlip();
         playDataBlip();
-        playInitBlip();
+        return;
     }
 }
