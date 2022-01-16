@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+
 import java.util.concurrent.RunnableFuture;
 
 
@@ -67,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception ex) {
             changeOverlayText("Send failed");
             revealClose();
+            v.setEnabled(true);
+
         }
 
     }
@@ -79,17 +84,36 @@ public class MainActivity extends AppCompatActivity {
     private void hideClose() {
         TextView text = findViewById(R.id.close);
         text.setVisibility(View.INVISIBLE);
+
     }
 
     public void openOverlay(View v) {
+
         openOverlay();
     }
 
     public void openOverlay() {
+        Button v = findViewById(R.id.send);
+        v.setEnabled(false);
+
         RelativeLayout layout = findViewById(R.id.overlay);
         layout.setVisibility(View.VISIBLE);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(layout);
+        YoYo.with(Techniques.FadeIn).duration(400).playOn(layout);
+
+        TextView status = findViewById(R.id.status);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(status);
+        YoYo.with(Techniques.FadeIn).duration(1000).playOn(status);
+
+        EditText form = findViewById(R.id.messageInput);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(form);
+        YoYo.with(Techniques.FadeIn).duration(1600).playOn(form);
+
         Button sendButton = findViewById(R.id.sendButton);
         sendButton.setEnabled(true);
+
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(sendButton);
+        YoYo.with(Techniques.FadeIn).duration(2200).playOn(sendButton);
         revealClose();
     }
 
@@ -100,7 +124,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeOverlay() {
         RelativeLayout layout = findViewById(R.id.overlay);
+        YoYo.with(Techniques.FadeOut).duration(400).playOn(layout);
         layout.setVisibility(View.INVISIBLE);
+        Button v = findViewById(R.id.send);
+        v.setEnabled(true);
         hideClose();
     }
 

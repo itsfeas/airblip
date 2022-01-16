@@ -99,21 +99,26 @@
                         android:paddingHorizontal="40dp"
                         android:gravity="center"
                         android:layout_alignParentTop="true"
+                        android:layout_marginVertical="15dp"
                         />
 
                     <EditText
                         android:id="@+id/messageInput"
+                        android:padding="10dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/status"
                         android:layout_marginHorizontal="30dp"
+
+                        android:gravity="center"
                         android:inputType="text"
                         android:paddingHorizontal="30dp"
-                        android:gravity="center"
-                        android:textColor="@color/blue"/>
+                        android:textColor="#517698"
+                        android:background="@drawable/edit_text_border"
+                        android:textColorHint="#99F1F6EF"/>
 
                     <Button
-                        android:layout_marginVertical="40dp"
+
                         android:layout_width="match_parent"
                         android:layout_marginHorizontal="30dp"
                         android:layout_height="wrap_content"
@@ -123,6 +128,8 @@
                         android:text="Send"
                         android:textAllCaps="false"
                         android:id = "@+id/sendButton"
+                        android:paddingVertical="10dp"
+                        android:textSize="16dp"
                         />
 
 <!--                    <RelativeLayout-->
