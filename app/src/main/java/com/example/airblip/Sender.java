@@ -90,7 +90,7 @@ public class Sender {
                     this.sampleRate,
                     AudioFormat.CHANNEL_OUT_MONO,
                     AudioFormat.ENCODING_PCM_16BIT,
-                    this.initNumBytes,
+                    this.dataNumBytes,
                     AudioTrack.MODE_STATIC
             );
 //            genSendSnd();
@@ -149,23 +149,29 @@ public class Sender {
         int nBits = this.file.size();
         List<Integer> bits = this.boolInts;
         double time = (double) nBits/this.transferFreq;
-        this.dataNumBytes = (int) (nBits * sampleRate);     // number of bytes for info blip
+        this.dataNumBytes = (int) (time * sampleRate);     // number of bytes for info blip
+        float timePerBit = (float) (time * sampleRate/nBits);     // number of bytes for info blip
 
         // fill out the array
         double sample[] = new double[dataNumBytes];
         for (int i = 0; i < dataNumBytes; ++i) {
-            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/dataSoundFreq));
+            if (bits.get(i/sampleRate) != 0) {
+                sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/dataSoundFreq));
+            }
+            else {
+                sample[i]=0;
+            }
         }
 
         int i = 0;
         byte generatedSnd[] = new byte[2 * dataNumBytes];
+        Integer bit;
         for (final double dVal : sample) {
             // scale to maximum amplitude
-
             short val = (short) ((dVal * 32767));
             // in 16 bit wav PCM, first byte is the low order byte
-            generatedSnd[2*i] = (byte) ((val & 0x00ff)*(bits.get(i/dataNumBytes)));
-            generatedSnd[2*i+1] = (byte) ((val & 0xff00) >>> 8);
+            generatedSnd[2*i] = (byte) ((val & 0x00ff)*(bits.get((int) (i/timePerBit))));
+            generatedSnd[2*i+1] = (byte) ((val & 0xff00)*(bits.get((int) (i/timePerBit))) >>> 8);
             i++;
         }
         this.dataBlipBytes = generatedSnd;
