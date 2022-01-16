@@ -88,10 +88,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openOverlay(View v) {
+
         openOverlay();
     }
 
     public void openOverlay() {
+        Button v = findViewById(R.id.send);
+        v.setEnabled(false);
+
         RelativeLayout layout = findViewById(R.id.overlay);
         layout.setVisibility(View.VISIBLE);
         YoYo.with(Techniques.FadeOut).duration(0).playOn(layout);
@@ -122,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout layout = findViewById(R.id.overlay);
         YoYo.with(Techniques.FadeOut).duration(400).playOn(layout);
         layout.setVisibility(View.INVISIBLE);
+        Button v = findViewById(R.id.send);
+        v.setEnabled(true);
         hideClose();
     }
 
