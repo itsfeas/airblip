@@ -54,6 +54,11 @@ public class Sender extends Service {
         this.sendStr = str;
         this.fileSetup = true;
     }
+    
+    public void setSendBytes(byte[] bytes) {
+        List<Byte> file = Bytes.asList(bytes);
+        setSendBytes(bytes);
+    }
 
     public void setSendBytes(List<Byte> bytes) {
         this.file = file;
