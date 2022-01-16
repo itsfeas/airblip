@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
+
 //                byte[] bytes = msg.getData().getByteArray("2");
 //                        service.setPath(bytes.toString());
 
@@ -94,6 +95,8 @@ public class Receiver {
             }
             out.println("A");
             buildFile();
+
+
             return getFileBytes();
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,3 +104,4 @@ public class Receiver {
         }
     }
 }
+

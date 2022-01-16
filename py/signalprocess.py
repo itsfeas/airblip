@@ -151,6 +151,38 @@ def crop(data):
 
     return data[low_bound:high_bound], low_bound, high_bound
 
+
+def audio_to_message(data):
+    t = np.linspace(0, data.shape[0]/SAMPLE_RATE, data.shape[0])
+    cleaned = butter_bandpass_filter(data, FREQ-100, FREQ+100, SAMPLE_RATE)
+
+
+
+    cleaned , low, high = crop(cleaned)
+    t_cropped = t[low:high]
+
+    avg = rms_filter(cleaned)
+    mean_avg = np.mean(avg)
+
+    pseudo_binary = np.zeros(avg.shape).astype(int)
+    pseudo_binary[avg > mean_avg] = 1
+
+    T_bit = 1/BAUD
+    step = int(T_bit * SAMPLE_RATE)
+    
+    points = []
+
+    binary = ""
+    ind = find_peak_midpoint(avg, mean_avg)
+    while ind < pseudo_binary.shape[0]:
+
+        binary += str(pseudo_binary[ind])
+        points.append(t_cropped[ind])
+        ind += step
+    
+    return binary
+
+
 if __name__ == "__main__":
     
     sound = wvfrm(FREQ, 2)
@@ -188,85 +220,88 @@ if __name__ == "__main__":
     print(input_sound.shape, SAMPLE_RATE)
 
 
-    t = np.linspace(0, input_sound.shape[0]/SAMPLE_RATE, input_sound.shape[0])
+    # t = np.linspace(0, input_sound.shape[0]/SAMPLE_RATE, input_sound.shape[0])
 
-    plt.plot(t, input_sound)
-    plt.show()
-
-
-    fft_sound = scipy.fft.fft(input_sound)
-    freq_bins = scipy.fft.fftfreq(input_sound.shape[0], 1/SAMPLE_RATE)[0:input_sound.shape[0]//2]
-
-    plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(fft_sound[0:input_sound.shape[0]//2]))
-    plt.grid()
-    plt.show()
-
-    band_pass_sound = butter_bandpass_filter(input_sound, FREQ-100, FREQ+100, SAMPLE_RATE)
-    plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(scipy.fft.fft(band_pass_sound)[0:input_sound.shape[0]//2]))
-    plt.grid()
-    plt.show()
-
-    plt.plot(t, band_pass_sound)
-    plt.show()
-
-    # sd.play(input_sound, SAMPLE_RATE)
-    # time.sleep(4)
-    # sd.stop()
+    # plt.plot(t, input_sound)
+    # plt.show()
 
 
-    # sd.play(band_pass_sound, SAMPLE_RATE)
-    # time.sleep(4)
-    # sd.stop()
+    # fft_sound = scipy.fft.fft(input_sound)
+    # freq_bins = scipy.fft.fftfreq(input_sound.shape[0], 1/SAMPLE_RATE)[0:input_sound.shape[0]//2]
+
+    # plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(fft_sound[0:input_sound.shape[0]//2]))
+    # plt.grid()
+    # plt.show()
+
+    # band_pass_sound = butter_bandpass_filter(input_sound, FREQ-100, FREQ+100, SAMPLE_RATE)
+    # plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(scipy.fft.fft(band_pass_sound)[0:input_sound.shape[0]//2]))
+    # plt.grid()
+    # plt.show()
+
+    # plt.plot(t, band_pass_sound)
+    # plt.show()
+
+    # # sd.play(input_sound, SAMPLE_RATE)
+    # # time.sleep(4)
+    # # sd.stop()
 
 
-    p = figure()
-
-    p.line(t, band_pass_sound, line_width=2)
-
-
-    avg = rms_filter(band_pass_sound)
-    p.line(t, avg, line_width=2, line_color="orange")
-    show(p)
+    # # sd.play(band_pass_sound, SAMPLE_RATE)
+    # # time.sleep(4)
+    # # sd.stop()
 
 
+    # p = figure()
+
+    # p.line(t, band_pass_sound, line_width=2)
+
+
+    # avg = rms_filter(band_pass_sound)
+    # p.line(t, avg, line_width=2, line_color="orange")
+    # show(p)
 
 
 
-    band_pass_sound , low, high = crop(band_pass_sound)
-    p = figure()
-
-    print(t[low:high].shape, band_pass_sound.shape)
-    p.line(t[low:high], band_pass_sound, line_width=2)
 
 
-    avg = rms_filter(band_pass_sound)
-    p.line(t[low:high], avg, line_width=2, line_color="orange")
+    # band_pass_sound , low, high = crop(band_pass_sound)
+    # p = figure()
+
+    # print(t[low:high].shape, band_pass_sound.shape)
+    # p.line(t[low:high], band_pass_sound, line_width=2)
 
 
-    mean_avg = np.mean(avg)
-    p.line(t[low:high], mean_avg, line_width=2, line_color="green")
+    # avg = rms_filter(band_pass_sound)
+    # p.line(t[low:high], avg, line_width=2, line_color="orange")
 
-    pseudo_binary = np.zeros(avg.shape).astype(int)
-    pseudo_binary[avg > mean_avg] = 1
 
-    T_bit = 1/BAUD
-    step = int(T_bit * SAMPLE_RATE)
+    # mean_avg = np.mean(avg)
+    # p.line(t[low:high], mean_avg, line_width=2, line_color="green")
+
+    # pseudo_binary = np.zeros(avg.shape).astype(int)
+    # pseudo_binary[avg > mean_avg] = 1
+
+    # T_bit = 1/BAUD
+    # step = int(T_bit * SAMPLE_RATE)
     
-    points = []
+    # points = []
 
-    binary = ""
-    ind = find_peak_midpoint(avg, mean_avg)
-    while ind < pseudo_binary.shape[0]:
+    # binary = ""
+    # ind = find_peak_midpoint(avg, mean_avg)
+    # while ind < pseudo_binary.shape[0]:
 
-        binary += str(pseudo_binary[ind])
-        points.append(t[low:high][ind])
-        ind += step
+    #     binary += str(pseudo_binary[ind])
+    #     points.append(t[low:high][ind])
+    #     ind += step
 
-    p.circle(points, mean_avg, color="red")
+    # p.circle(points, mean_avg, color="red")
 
-    show(p)
+    # show(p)
     
-    print(binary)
-    write("filtered_testaudio.wav", SAMPLE_RATE, band_pass_sound)
+    # print(binary)
+    # write("filtered_testaudio.wav", SAMPLE_RATE, band_pass_sound)
+
+    decoded_raw = audio_to_message(input_sound)
+    decoded_cleaned = 
 
 

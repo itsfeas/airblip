@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         v.setEnabled(false);
         sender.setStr("Hello World");
         sender.beginSending();
+//        PythonEnv.run();
     }
 
     public void openOverlay(){
