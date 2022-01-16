@@ -1,0 +1,10 @@
+numpy
+scipy
+sklearn
+sounddevice
+pandas
+matplotlib
+bokeh
+pyaudio
+wave
+librosa

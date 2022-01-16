@@ -55,7 +55,6 @@ class Recorder:
             # if you want to hear your voice while recording
             # stream.write(data)
             frames.append(data)
-            QApplication.processEvents()
         print("Finished recording.")
 
         wf = wave.open(path, "wb")
@@ -71,8 +70,8 @@ class Recorder:
         wf.close()
 
 
-    def return_np(self):
-        y, sr = librosa.load("sample.wav")
+    def return_np(self, file):
+        y, sr = librosa.load(file)
         input_sound = librosa.resample(y, sr, SAMPLE_RATE)
         print(input_sound.shape, SAMPLE_RATE)
 
@@ -248,17 +247,17 @@ def audio_to_message(data):
     pseudo_binary = np.zeros(avg.shape).astype(int)
     pseudo_binary[avg > mean_avg] = 1
 
-    p = figure()
+    # p = figure()
 
-    p.line(t_cropped, cleaned, line_width=2)
-
-
-
-    p.line(t_cropped, avg, line_width=2, line_color="orange")
+    # p.line(t_cropped, cleaned, line_width=2)
 
 
 
-    p.line(t_cropped, mean_avg, line_width=2, line_color="green")
+    # p.line(t_cropped, avg, line_width=2, line_color="orange")
+
+
+
+    # p.line(t_cropped, mean_avg, line_width=2, line_color="green")
 
     T_bit = 1/BAUD
     step = int(T_bit * SAMPLE_RATE)
@@ -272,9 +271,9 @@ def audio_to_message(data):
         binary += str(pseudo_binary[ind])
         points.append(t_cropped[ind])
         ind += step
-    p.circle(points, mean_avg, color="red")
+    # p.circle(points, mean_avg, color="red")
 
-    show(p)
+    # show(p)
 
     return binary
 
