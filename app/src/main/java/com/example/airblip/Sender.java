@@ -4,8 +4,11 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 
+import com.google.common.primitives.Bytes;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +20,13 @@ public class Sender {
     private AudioTrack initBlip;
     private AudioTrack dataBlip;
 
-    private final double transferFreq = 100;                                    // hz
-    private double dataSoundFreq = 1000;                                        // hz
-    private double initSoundFreq = 1500;                                        // hz
-    private int sampleRate = 20000;                                             // hz
+    private final double transferFreq = 100;                                  // hz
+    private double dataSoundFreq = 1000;                                    // hz
+    private double initSoundFreq = 1500;                                    // hz
+    private int sampleRate = 20000;                                     // hz
 
-    private double initBlipLen = 1;                                             // secs
-    private int initNumBytes = (int) (initBlipLen * sampleRate);                // number of bytes for conf blip
+    private double initBlipLen = 1;                                     // secs
+    private int initNumBytes = (int) (initBlipLen * sampleRate);     // number of bytes for conf blip
     private int dataNumBytes;     // number of bytes for conf blip
 
     List<Boolean> file;
@@ -98,32 +101,51 @@ public class Sender {
         }
     }
 
-    private double sinGen(int i, int num, double denom) {
-        return Math.sin(2 * Math.PI * i / (num/denom));
-    }
+//    private void emptyBytes(){
+//        // fill out the array
+//        for (int i = 0; i < numSamples; ++i) {
+//            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+//        }
+//
+//        // convert to 16 bit pcm sound array
+//        // assumes the sample buffer is normalised.
+//        int idx = 0;
+//        for (final double dVal : sample) {
+//            // scale to maximum amplitude
+//            final short val = (short) ((dVal * 32767));
+//            // in 16 bit wav PCM, first byte is the low order byte
+//            generatedSnd[idx++] = (byte) (val & 0x00ff);
+//            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+//
+//        }
+//    }
 
-
-    // PCM-16 encoding obtained from
+    // sinewave gen based on
     // https://stackoverflow.com/questions/8698633/how-to-generate-a-particular-sound-frequency
-    private void genTone(){
+    void genTone(){
         // fill out the array
         double sample[] = new double[initNumBytes];
         double replicate[] = new double[initNumBytes];
         for (int i = 0; i < initNumBytes; ++i) {
-            sample[i] = sinGen(i, this.sampleRate, this.initSoundFreq);
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/initSoundFreq));
+        }
+        for (int i = 0; i < initNumBytes; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/initSoundFreq));
         }
         int idx = 0;
         byte generatedSnd[] = new byte[2 * initNumBytes];
 
         for (final double dVal : sample) {
+            // scale to maximum amplitude
             final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
             generatedSnd[idx++] = (byte) (val & 0x00ff);
             generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
         }
         this.initBlipBytes = generatedSnd;
     }
 
-    private void genSendSnd(){
+    void genSendSnd(){
         int nBits = this.file.size();
         List<Integer> bits = this.boolInts;
         double time = (double) nBits/this.transferFreq;
@@ -134,7 +156,7 @@ public class Sender {
         double sample[] = new double[dataNumBytes];
         for (int i = 0; i < dataNumBytes; ++i) {
             if (bits.get(i/sampleRate) != 0) {
-                sample[i] = sinGen(i,sampleRate, dataSoundFreq);
+                sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/dataSoundFreq));
             }
             else {
                 sample[i]=0;
@@ -145,7 +167,9 @@ public class Sender {
         byte generatedSnd[] = new byte[2 * dataNumBytes];
         Integer bit;
         for (final double dVal : sample) {
+            // scale to maximum amplitude
             short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
             generatedSnd[2*i] = (byte) ((val & 0x00ff)*(bits.get((int) (i/timePerBit))));
             generatedSnd[2*i+1] = (byte) ((val & 0xff00)*(bits.get((int) (i/timePerBit))) >>> 8);
             i++;
