@@ -2,7 +2,12 @@ package com.example.airblip;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 
 import com.google.common.primitives.Bytes;
 
@@ -14,12 +19,16 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
+//                byte[] bytes = msg.getData().getByteArray("2");
+//                        service.setPath(bytes.toString());
+
 public class Receiver extends Service {
     private Socket sock;
-    private String host = "localhost";
+    private final String host = "localhost";
     private PrintWriter out;
     private BufferedReader in;
     private List<Byte> file;
+    private final Messenger messenger = new Messenger(new toServiceReceiver(this));
 
     public Receiver() {
     }
@@ -34,6 +43,10 @@ public class Receiver extends Service {
 
     private PrintWriter getOutput() {
         return this.out;
+    }
+
+    private byte[] getFileBytes() {
+        return Bytes.toArray(this.file);
     }
 
     private void addToFile(byte[] bytes) {
@@ -64,7 +77,7 @@ public class Receiver extends Service {
         }
     }
 
-    private void buildSequence() {
+    public void listenSequence() {
         BufferedReader in = getInput();
         PrintWriter out = getOutput();
 
@@ -80,10 +93,21 @@ public class Receiver extends Service {
         }
     }
 
+    private void sendFile() {
+        Bundle bundle = new Bundle();
+        bundle.putByteArray("1", getFileBytes());
+        Message msg = Message.obtain();
+        msg.setData(bundle);
+        try {
+            this.messenger.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return messenger.getBinder();
     }
 
     @Override
