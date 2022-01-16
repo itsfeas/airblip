@@ -63,9 +63,7 @@ public class MainActivity extends AppCompatActivity {
 //        PythonEnv.run();
     }
 
-        }
 
-    }
 
     private void revealClose() {
         TextView text = findViewById(R.id.close);
