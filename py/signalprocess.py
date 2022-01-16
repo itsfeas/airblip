@@ -10,8 +10,11 @@ import matplotlib.pyplot as plt
 import librosa
 import scipy
 from scipy.signal import butter, lfilter
+import bokeh
+from bokeh.plotting import figure, show
 
-BAUD = 100
+
+BAUD = 200
 FREQ =  2000
 SAMPLE_RATE = 48000
 np.set_printoptions(threshold=sys.maxsize)
@@ -48,6 +51,7 @@ def starting_byte():
     return out_array
 
 
+
 def wvfrm(freq, time):
     """
     freq: Hz
@@ -69,7 +73,9 @@ def bits(path):
             for i in range(8):
                 yield (b >> i) & 1
 
-
+for b in bits("testfile"):
+    print(b, end="")
+print("")
 
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
@@ -101,15 +107,16 @@ if __name__ == "__main__":
 
 
     start_beeps = starting_byte()
-    start_beeps = np.concatenate([np.zeros(start_beeps.shape), start_beeps, start_beeps,start_beeps,start_beeps], axis=0)
+    start_beeps = np.concatenate([start_beeps, start_beeps,start_beeps,start_beeps], axis=0)
     sd.play(start_beeps, SAMPLE_RATE)
-    time.sleep(1)
+    time.sleep(2)
     sd.stop()
 
     sound = bits_to_sound(bits("testfile"))
+    sound = np.concatenate([sound, start_beeps], axis=0)
 
     sd.play(sound, SAMPLE_RATE)
-    time.sleep(1)
+    time.sleep(4)
     sd.stop()
 
     y, sr = librosa.load("testaudio.mp3")
@@ -130,7 +137,7 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    band_pass_sound = butter_bandpass_filter(input_sound, 1900, 2100, SAMPLE_RATE)
+    band_pass_sound = butter_bandpass_filter(input_sound, 1800, 2200, SAMPLE_RATE)
     plt.plot(freq_bins, 2.0/input_sound.shape[0] * np.abs(scipy.fft.fft(band_pass_sound)[0:input_sound.shape[0]//2]))
     plt.grid()
     plt.show()
@@ -146,5 +153,9 @@ if __name__ == "__main__":
     sd.play(band_pass_sound, SAMPLE_RATE)
     time.sleep(4)
     sd.stop()
+
+    p = figure()
+    p.line(t, band_pass_sound, line_width=2)
+    show(p)
    
     write("filtered_testaudio.wav", SAMPLE_RATE, band_pass_sound)
