@@ -7,7 +7,12 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -35,6 +40,7 @@ public class Sender extends Service {
     private int initNumBytes = (int) (initBlipLen * sampleRate);     // number of bytes for conf blip
 
     List<Byte> file;
+    private final Messenger messenger = new Messenger(new toServiceSender(this));
 
     public Sender() {
         setUpInitBlip();
@@ -98,20 +104,33 @@ public class Sender extends Service {
         this.dataBlip.play();
     }
 
+    private void sendConf() {
+        Bundle bundle = new Bundle();
+        bundle.putString("1", "A");
+        Message msg = Message.obtain();
+        msg.setData(bundle);
+        try {
+            this.messenger.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void beginSending(String file) {
-        setPath(file);
+    public void beginSending() {
         setUpInitBlip();
         playInitBlip();
 
         setUpDataBlip();
         playDataBlip();
+        playInitBlip();
+
+        sendConf();                 //send confirmation of send to activity
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return messenger.getBinder();
     }
 
     @Override

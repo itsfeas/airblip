@@ -10,9 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Airblip">
         <service
-            android:name=".Sender"
+            android:name=".Receiver"
             android:enabled="true"
             android:exported="true"></service>
+        <service
+            android:name=".Sender"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity
             android:name=".MainActivity"
