@@ -6,11 +6,11 @@ import android.os.Message;
 
 import androidx.annotation.RequiresApi;
 
-public class toServiceReceiver extends Handler {
-    private Receiver service;
+public class toActivityMain extends Handler {
+    private Sender service;
 
-    public toServiceReceiver(Receiver receive) {
-        this.service = receive;
+    public toActivityMain(Sender send) {
+        this.service = send;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -18,7 +18,10 @@ public class toServiceReceiver extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case 1:
-                service.listenSequence();
+                byte[] bytes = msg.getData().getByteArray("1");
+                service.setSendBytes(bytes);
+            case 2:
+                service.beginSending();
         }
     }
 }

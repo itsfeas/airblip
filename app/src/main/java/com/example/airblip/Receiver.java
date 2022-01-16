@@ -11,6 +11,8 @@ import android.os.RemoteException;
 
 import com.google.common.primitives.Bytes;
 
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,8 +30,14 @@ public class Receiver {
     private PrintWriter out;
     private BufferedReader in;
     private List<Byte> file;
+//    PythonInterpreter py = new PythonInterpreter();
 
     public Receiver() {
+        try {
+//            py.exec("print('Hello Python World!')");
+        } finally {
+
+        }
     }
 
     private Socket getSocket() {

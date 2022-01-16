@@ -19,7 +19,10 @@ import androidx.annotation.RequiresApi;
 
 import com.google.common.primitives.Bytes;
 
+
+
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,7 +63,7 @@ public class Sender {
     }
 
     public void setSendBytes(List<Byte> bytes) {
-        this.file = file;
+        this.file = bytes;
     }
 
     private boolean readFileBytes() throws IOException {
@@ -74,6 +77,16 @@ public class Sender {
     private void setUpDataBlip() {
         try {
             readFileBytes();
+            AudioTrack dataBlip = new AudioTrack(
+                    AudioManager.STREAM_MUSIC,
+                    this.sampleRate,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    this.initNumBytes,
+                    AudioTrack.MODE_STATIC
+            );
+            dataBlip.write((ByteBuffer) this.file, 0, this.file.size());
+            this.dataBlip = dataBlip;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,6 +105,7 @@ public class Sender {
                     AudioTrack.MODE_STATIC
             );
             initBlip.write(bytes, 0, bytes.length);
+            this.initBlip = initBlip;
         } catch (Exception e) {
             e.printStackTrace();
         }
