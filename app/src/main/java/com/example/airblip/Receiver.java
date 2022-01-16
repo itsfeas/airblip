@@ -22,13 +22,12 @@ import java.util.List;
 //                byte[] bytes = msg.getData().getByteArray("2");
 //                        service.setPath(bytes.toString());
 
-public class Receiver extends Service {
+public class Receiver {
     private Socket sock;
     private final String host = "localhost";
     private PrintWriter out;
     private BufferedReader in;
     private List<Byte> file;
-    private final Messenger messenger = new Messenger(new toServiceReceiver(this));
 
     public Receiver() {
     }
@@ -77,50 +76,20 @@ public class Receiver extends Service {
         }
     }
 
-    public void listenSequence() {
+    public byte[] beginListening() {
         BufferedReader in = getInput();
         PrintWriter out = getOutput();
-
         try {
             String initByte = in.readLine();
             if (initByte != "B") {
-                return;
+                return null;
             }
             out.println("A");
             buildFile();
+            return getFileBytes();
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-    }
-
-    private void sendFile() {
-        Bundle bundle = new Bundle();
-        bundle.putByteArray("1", getFileBytes());
-        Message msg = Message.obtain();
-        msg.setData(bundle);
-        try {
-            this.messenger.send(msg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return messenger.getBinder();
-    }
-
-    @Override
-    public void onCreate() {
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_NOT_STICKY;
     }
 }
