@@ -36,7 +36,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:onClick="startReceiving"
-                    android:text="Start receiving" />
+                    android:text="Start receiving"
+                    android:backgroundTint= "@color/light_yellow"
+                    android:textColor="@color/dark_blue"/>
 
                 <Button
                     android:id="@+id/send"
@@ -44,7 +46,10 @@
                     android:layout_height="wrap_content"
                     android:text="Start sending"
                     android:onClick="startSending"
-                    android:layout_below="@+id/receive" />
+                    android:backgroundTint= "@color/dark_blue"
+                    android:textColor="@color/light_yellow"
+                    android:layout_below="@+id/receive"
+                    />
             </RelativeLayout>
 
 <!--            <RelativeLayout-->
