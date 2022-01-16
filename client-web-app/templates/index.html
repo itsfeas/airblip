@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style = "padding: 0;margin: 0;">
+    <div style = "display: flex; align-items: center; justify-content: center;flex-direction: column;height: 100vh; background: rgb(27, 33, 51);">
+        <button id = "receiveButton" onclick="record()" style = "padding: 20px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;color: rgb(27, 33, 51); font-weight: 700;">Receive signal</button>
+        
+        <h1 id = "message" style = "color: rgb(238, 238, 221);font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"  >Your message is...</h1>    
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/record.js') }}"></script>
+</body>
+</html>
