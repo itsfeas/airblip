@@ -17,7 +17,7 @@ import pyaudio, wave
 
 
 
-BAUD = 100
+BAUD = 20
 FREQ =  1000
 SAMPLE_RATE = 48000
 np.set_printoptions(threshold=sys.maxsize)

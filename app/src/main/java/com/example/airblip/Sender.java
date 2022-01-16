@@ -6,6 +6,7 @@ import android.media.AudioTrack;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class Sender {
     private AudioTrack initBlip;
     private AudioTrack dataBlip;
 
-    private final double transferFreq = 100;                                    // hz
+    private final double transferFreq = 20;                                    // hz
     private double dataSoundFreq = 1000;                                        // hz
     private double initSoundFreq = 1500;                                        // hz
     private int sampleRate = 20000;                                             // hz
@@ -45,12 +46,12 @@ public class Sender {
     public void setSendBytes() throws UnsupportedEncodingException {
         String str = this.sendStr;
         int len = str.length()*8;
-
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
         List<Boolean> bins = new ArrayList<Boolean>(len);
         List<Integer> intBins = new ArrayList<Integer>(len);
         String binStr;
         for (int i = 0; i<str.length(); i++) {
-            binStr = Integer.toBinaryString(str.charAt(i) & 255 | 256).substring(1);
+            binStr = Integer.toBinaryString(bytes[i]);
             for (int j = 0; j<binStr.length(); j++) {
                 if (binStr.charAt(j)=='1') {
                     bins.add(true);

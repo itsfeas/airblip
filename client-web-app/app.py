@@ -13,7 +13,7 @@ rec = Recorder()
 
 path = './src/record/'
 fileName = 'record.wav'
-recTime = 10
+recTime = 7
 
 
 @app.route('/')
