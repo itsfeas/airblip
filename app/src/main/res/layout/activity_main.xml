@@ -7,7 +7,6 @@
     tools:context=".MainActivity"
     android:background="@color/blue"
     >
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -15,79 +14,160 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
-            <TextView
-                android:id="@+id/textview_first"
+            <ImageView
+                android:id="@+id/logoText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/landingButtons"
+                android:layout_marginBottom="120dp"
+                android:src="@drawable/airblip"
                 android:text="@string/title"
+                android:textColor="@color/light_blue"
                 android:layout_centerHorizontal="true"
-                android:layout_alignParentTop = "true" />
+                />
+
 
             <RelativeLayout
+                android:id = "@+id/landingButtons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp" >
+                android:paddingRight="16dp"
 
-                <Button
-                    android:id="@+id/receive"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:onClick="startReceiving"
-                    android:text="Start receiving"
-                    android:backgroundTint= "@color/light_yellow"
-                    android:textColor="@color/dark_blue"/>
+               >
+
+<!--                <Button-->
+<!--                    android:id="@+id/receive"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_alignParentTop="true"-->
+<!--                    android:onClick="startReceiving"-->
+<!--                    android:text="Start receiving"-->
+<!--                    android:backgroundTint= "@color/light_yellow"-->
+<!--                    android:textColor="@color/dark_blue"-->
+<!--                    android:fontFamily="@font/rm_bold"-->
+<!--                    android:paddingVertical="30dp"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:elevation="20dp"-->
+<!--                    />-->
+
+
 
                 <Button
                     android:id="@+id/send"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Start sending"
-                    android:onClick="startSending"
+                    android:onClick="promptString"
                     android:backgroundTint= "@color/dark_blue"
                     android:textColor="@color/light_yellow"
-                    android:layout_below="@+id/receive"
+                    android:fontFamily="@font/rm_bold"
+                    android:paddingVertical="30dp"
+                    android:textAllCaps="false"
                     />
             </RelativeLayout>
 
-<!--            <RelativeLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_centerInParent="true"-->
-<!--                android:paddingLeft="16dp"-->
-<!--                android:paddingRight="16dp"-->
-<!--                android:layout_marginVertical="32dp"-->
-<!--                android:layout_marginHorizontal="16dp"-->
-<!--                android:background="@color/light_yellow"-->
-<!--                android:id="@+id/overlay"-->
-<!--                >-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/exit"-->
-<!--                    android:layout_alignParentRight="true"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:onClick="reset"-->
-<!--                    android:text="X" />-->
+        </RelativeLayout>
 
-<!--                <TextView-->
-<!--                    android:id="@+id/status"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_alignParentTop="true"-->
-<!--                    android:layout_centerInParent="true"-->
-<!--                    android:textColor="@color/dark_blue"-->
-<!--                    android:font ="@font/RobotoMono"-->
-<!--                    android:textFontWeight="700"-->
-<!--                    android:text="Searching for sender..." />-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+
+                android:background="@color/light_yellow"
+                android:id="@+id/overlay"
+                >
 
 
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/dark_blue"
+                        android:font ="@font/rm_bold"
+                        android:textFontWeight="700"
+                        android:lineSpacingMultiplier="0.8"
+                        android:textSize="30dp"
+                        android:text="Enter a message"
+                        android:paddingHorizontal="40dp"
+                        android:gravity="center"
+                        android:layout_alignParentTop="true"
+                        />
+
+                    <EditText
+                        android:id="@+id/messageInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/status"
+                        android:layout_marginHorizontal="30dp"
+                        android:inputType="text"
+                        android:paddingHorizontal="30dp"
+                        android:gravity="center"
+                        android:textColor="@color/blue"/>
+
+                    <Button
+                        android:layout_marginVertical="40dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="30dp"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/messageInput"
+                        android:onClick="startSending"
+                        android:backgroundTint= "@color/dark_blue"
+                        android:text="Send"
+                        android:textAllCaps="false"
+                        android:id = "@+id/sendButton"
+                        />
+
+<!--                    <RelativeLayout-->
+<!--                        android:id = "@+id/resultBox"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@color/dark_blue"-->
+
+<!--                        android:layout_below="@+id/status"-->
+<!--                        >-->
+<!--                        <TextView-->
+
+<!--                            android:id="@+id/messageDisplay"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:textColor="@color/light_blue"-->
+<!--                            android:font ="@font/rm_bold"-->
+<!--                            android:lineSpacingMultiplier="0.8"-->
+<!--                            android:textSize="20dp"-->
+<!--                            android:text="Default Message Default Message Default Message Default Message "-->
+<!--                            android:gravity="center"-->
+<!--                            android:padding="40dp"/>-->
+
+<!--                    </RelativeLayout>-->
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/close"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:font ="@font/rm_bold"
+                    android:text="close"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:layout_alignParentBottom="true"
+                    android:textColor = "@color/blue"
+                    android:textSize="20dp"
+                    android:paddingVertical="15dp"
+                    android:onClick = "closeOverlay"
+                    >
+
+                </TextView>
+            </RelativeLayout>
 
 
-<!--            </RelativeLayout>-->
-    </RelativeLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
