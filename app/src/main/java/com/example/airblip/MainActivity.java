@@ -96,8 +96,20 @@ public class MainActivity extends AppCompatActivity {
         layout.setVisibility(View.VISIBLE);
         YoYo.with(Techniques.FadeOut).duration(0).playOn(layout);
         YoYo.with(Techniques.FadeIn).duration(400).playOn(layout);
+
+        TextView status = findViewById(R.id.status);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(status);
+        YoYo.with(Techniques.FadeIn).duration(1000).playOn(status);
+
+        EditText form = findViewById(R.id.messageInput);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(form);
+        YoYo.with(Techniques.FadeIn).duration(1600).playOn(form);
+
         Button sendButton = findViewById(R.id.sendButton);
         sendButton.setEnabled(true);
+
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(sendButton);
+        YoYo.with(Techniques.FadeIn).duration(2200).playOn(sendButton);
         revealClose();
     }
 
