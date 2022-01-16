@@ -123,6 +123,7 @@ public class Sender extends Service {
 
         setUpDataBlip();
         playDataBlip();
+        playInitBlip();
 
         sendConf();                 //send confirmation of send to activity
     }
