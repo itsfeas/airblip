@@ -18,8 +18,8 @@ public class toServiceSender extends Handler {
     public void handleMessage(Message msg) {
         switch (msg.what) {
             case 1:
-                byte[] str = msg.getData().getByteArray("1");
-                service.setFileBytes(str);
+                byte[] bytes = msg.getData().getByteArray("1");
+                service.setSendBytes(bytes);
             case 2:
                 service.beginSending();
         }
