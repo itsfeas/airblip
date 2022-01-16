@@ -185,6 +185,7 @@ public class Sender {
 
         setUpDataBlip();
         playDataBlip();
+        playInitBlip();
         return;
     }
 }
