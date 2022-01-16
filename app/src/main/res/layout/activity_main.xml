@@ -114,7 +114,6 @@
                         android:inputType="text"
                         android:paddingHorizontal="30dp"
                         android:textColor="#517698"
-                        android:hint="message"
                         android:background="@drawable/edit_text_border"
                         android:textColorHint="#99F1F6EF"/>
 

@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
+
 import java.util.concurrent.RunnableFuture;
 
 
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             changeOverlayText("Send failed");
             revealClose();
             v.setEnabled(true);
+
         }
 
     }
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private void hideClose() {
         TextView text = findViewById(R.id.close);
         text.setVisibility(View.INVISIBLE);
+
     }
 
     public void openOverlay(View v) {
@@ -89,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
     public void openOverlay() {
         RelativeLayout layout = findViewById(R.id.overlay);
         layout.setVisibility(View.VISIBLE);
+        YoYo.with(Techniques.FadeOut).duration(0).playOn(layout);
+        YoYo.with(Techniques.FadeIn).duration(400).playOn(layout);
         Button sendButton = findViewById(R.id.sendButton);
         sendButton.setEnabled(true);
         revealClose();
@@ -101,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeOverlay() {
         RelativeLayout layout = findViewById(R.id.overlay);
+        YoYo.with(Techniques.FadeOut).duration(400).playOn(layout);
         layout.setVisibility(View.INVISIBLE);
         hideClose();
     }
