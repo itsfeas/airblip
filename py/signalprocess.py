@@ -19,7 +19,7 @@ import pyaudio, wave
 
 BAUD = 100
 FREQ =  1000
-SAMPLE_RATE = 48000
+SAMPLE_RATE = 16000
 np.set_printoptions(threshold=sys.maxsize)
 
 
@@ -55,7 +55,6 @@ class Recorder:
             # if you want to hear your voice while recording
             # stream.write(data)
             frames.append(data)
-            QApplication.processEvents()
         print("Finished recording.")
 
         wf = wave.open(path, "wb")
@@ -248,17 +247,17 @@ def audio_to_message(data):
     pseudo_binary = np.zeros(avg.shape).astype(int)
     pseudo_binary[avg > mean_avg] = 1
 
-    p = figure()
+    # p = figure()
 
-    p.line(t_cropped, cleaned, line_width=2)
-
-
-
-    p.line(t_cropped, avg, line_width=2, line_color="orange")
+    # p.line(t_cropped, cleaned, line_width=2)
 
 
 
-    p.line(t_cropped, mean_avg, line_width=2, line_color="green")
+    # p.line(t_cropped, avg, line_width=2, line_color="orange")
+
+
+
+    # p.line(t_cropped, mean_avg, line_width=2, line_color="green")
 
     T_bit = 1/BAUD
     step = int(T_bit * SAMPLE_RATE)
@@ -272,9 +271,9 @@ def audio_to_message(data):
         binary += str(pseudo_binary[ind])
         points.append(t_cropped[ind])
         ind += step
-    p.circle(points, mean_avg, color="red")
+    # p.circle(points, mean_avg, color="red")
 
-    show(p)
+    # show(p)
 
     return binary
 
@@ -292,7 +291,9 @@ def binary_string_to_ascii(string):
         if j >= 8:
             j=0
             integer = int(bin_char, 2)
-            ascii_char = chr(integer)
+            ascii_char = str(integer).encode("utf-8").decode("utf-8")
+            # ascii_char = chr(integer)
+            # ascii_str = "".append(ascii_char)
             chars.append(ascii_char)
             bin_char = ""
 
@@ -326,9 +327,9 @@ if __name__ == "__main__":
     sound = bits_to_sound(bits("testfile"))
     sound = np.concatenate([start_beeps, sound, end_beeps], axis=0)
 
-    sd.play(sound, SAMPLE_RATE)
-    time.sleep(4)
-    sd.stop()
+    # sd.play(sound, SAMPLE_RATE)
+    # time.sleep(4)
+    # sd.stop()
 
 
     # Records for 6 seconds, saves to sample.wav
@@ -345,6 +346,7 @@ if __name__ == "__main__":
     decoded_raw = audio_to_message(input_sound)
     decoded_cleaned = clip_string(decoded_raw) # gets rid of end pieces
     print(decoded_cleaned)
+    print("Cleaned")
     print(binary_string_to_ascii(decoded_cleaned))
 
 

@@ -14,6 +14,6 @@ function record() {
         // document.getElementById("message").blur()
         // return response.json();
 
-        setTimeout("location.reload(true);", 3000+10000);
+        setTimeout("location.reload(true);", 3000+7000);
     })
 }

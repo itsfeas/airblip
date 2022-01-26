@@ -18,10 +18,10 @@ public class Sender {
     private AudioTrack initBlip;
     private AudioTrack dataBlip;
 
-    private final double transferFreq = 20;                                    // hz
+    private final double transferFreq = 100;                                    // hz
     private double dataSoundFreq = 1000;                                        // hz
     private double initSoundFreq = 1500;                                        // hz
-    private int sampleRate = 20000;                                             // hz
+    private int sampleRate = 16000;                                             // hz
 
     private double initBlipLen = 1;                                             // secs
     private int initNumBytes = (int) (initBlipLen * sampleRate);                // number of bytes for conf blip
@@ -135,7 +135,7 @@ public class Sender {
         // fill out the array
         double sample[] = new double[dataNumBytes];
         for (int i = 0; i < dataNumBytes; ++i) {
-            if (bits.get(i/sampleRate) != 0) {
+            if (bits.get((int) (i/timePerBit)) != 0) {
                 sample[i] = sinGen(i,sampleRate, dataSoundFreq);
             }
             else {
@@ -184,9 +184,11 @@ public class Sender {
     public void beginSending() {
         setUpInitBlip();
         playInitBlip();
+        playInitBlip();
 
         setUpDataBlip();
         playDataBlip();
+        playInitBlip();
         playInitBlip();
         return;
     }
